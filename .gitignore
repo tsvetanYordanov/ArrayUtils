@@ -87,3 +87,9 @@ ENV/
 
 # Rope project settings
 .ropeproject
+
+
+
+#IntelliJ specific project files
+*.iml
+/.idea/*
