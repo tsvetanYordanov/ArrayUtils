@@ -61,21 +61,8 @@ def main(argv):
     #     help='PPT version to which this project should be updated')
 
     args = arg_parser.parse_args(args=argv[1:])
-
-    # Find the .ppt-version file and read the commit hash from it.
-    ppt_version_path = os.path.join(
-        args.current_project_directory, '.ppt-version')
-    if not os.path.exists(ppt_version_path):
-        raise SystemExit(
-            'PPT version cookie not found: {0}'.format(ppt_version_path))
-    with open(ppt_version_path) as ppt_version_file:
-        for line in ppt_version_file:
-            # Allow for comments in the file.
-            if not line.startswith('#'):
-                old_revision = line.rstrip()
-                break
-
     # Grab the path to metadata from setup.py, as we know where that file is.
+    old_revision, ppt_version_path = handle_git_ppt_version(args)
     # We're not sure of the directory where metadata.py resides. We need to
     # change directories instead of importing the module directly because there
     # are dependent imports.
@@ -153,6 +140,23 @@ def main(argv):
     print('Removing temporary directories...')
     for dir_ in [old_ppt_directory, new_ppt_directory]:
         shutil.rmtree(dir_)
+
+
+def handle_git_ppt_version(args):
+    # Find the .ppt-version file and read the commit hash from it.
+    ppt_version_path = os.path.join(
+        args.current_project_directory, '.ppt-version')
+    if not os.path.exists(ppt_version_path):
+        raise SystemExit(
+            'PPT version cookie not found: {0}'.format(ppt_version_path))
+    with open(ppt_version_path) as ppt_version_file:
+        for line in ppt_version_file:
+            # Allow for comments in the file.
+            if not line.startswith('#'):
+                old_revision = line.rstrip()
+                break
+
+    return old_revision, ppt_version_path
 
 
 if __name__ == '__main__':
